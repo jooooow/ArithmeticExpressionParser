@@ -1,0 +1,9 @@
+﻿  Caculator.cpp
+c:\users\lenovo\documents\visual studio 2015\projects\consolecalc\consolecalc\caculator.cpp(119): warning C4018: '>': signed/unsigned mismatch
+c:\users\lenovo\documents\visual studio 2015\projects\consolecalc\consolecalc\caculator.cpp(403): warning C4018: '<': signed/unsigned mismatch
+  Generating Code...
+  Compiling...
+  Main.cpp
+  Generating Code...
+  ConsoleCalc.vcxproj -> C:\Users\Lenovo\documents\visual studio 2015\Projects\ConsoleCalc\Debug\ConsoleCalc.exe
+  ConsoleCalc.vcxproj -> C:\Users\Lenovo\documents\visual studio 2015\Projects\ConsoleCalc\Debug\ConsoleCalc.pdb (Partial PDB)

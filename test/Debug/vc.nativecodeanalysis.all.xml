@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?><DEFECTS><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\lenovo\documents\visual studio 2015\projects\consolecalc\consolecalc\</FILEPATH>
+      <FILENAME>main.cpp</FILENAME>
+      <LINE>76</LINE>
+      <COLUMN>9</COLUMN>
+    </SFA>
+    <DEFECTCODE>6031</DEFECTCODE>
+    <DESCRIPTION>Return value ignored: 'getchar'.</DESCRIPTION>
+    <FUNCTION>input</FUNCTION>
+    <DECORATED>?input@@YA_NAAVCalculator@@PBD@Z</DECORATED>
+    <FUNCLINE>69</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT></DEFECTS>

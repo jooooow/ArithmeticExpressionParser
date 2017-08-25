@@ -1,7 +1,7 @@
 # ArithmeticExpressionParser
 This is a C++ class to parse arithmetic expression.
 
-### provides:  
+### Features  
 
 * `legality check`
 

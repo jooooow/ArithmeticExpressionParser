@@ -2,7 +2,7 @@
 Copyright (c) 2017 jooooow All rights reserved
 Author : jooooow
 Date : 2017-08-21
-File : test.cpp
+File : Main.cpp
 Description : a test of the arithmetic expression parser class
 ************************************************/
 
@@ -27,7 +27,10 @@ bool input(Calculator& calc, const char* source)
 		getchar();
 		return false;
 	}
-	calc.printResult();
+	if (!calc.isError())
+		calc.printResult();
+	else
+		calc.printError(calc.getErrorInformtion());
 	return true;
 }
 

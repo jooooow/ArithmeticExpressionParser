@@ -1,9 +1,9 @@
-﻿  Caculator.cpp
-c:\users\lenovo\documents\visual studio 2015\projects\consolecalc\consolecalc\caculator.cpp(119): warning C4018: '>': signed/unsigned mismatch
-c:\users\lenovo\documents\visual studio 2015\projects\consolecalc\consolecalc\caculator.cpp(403): warning C4018: '<': signed/unsigned mismatch
+﻿  Main.cpp
   Generating Code...
   Compiling...
-  Main.cpp
+  Caculator.cpp
+f:\git\clone\arithmeticexpressionparser\test\caculator.cpp(97): warning C4018: '>': signed/unsigned mismatch
+f:\git\clone\arithmeticexpressionparser\test\caculator.cpp(436): warning C4018: '<': signed/unsigned mismatch
   Generating Code...
-  ConsoleCalc.vcxproj -> C:\Users\Lenovo\documents\visual studio 2015\Projects\ConsoleCalc\Debug\ConsoleCalc.exe
-  ConsoleCalc.vcxproj -> C:\Users\Lenovo\documents\visual studio 2015\Projects\ConsoleCalc\Debug\ConsoleCalc.pdb (Partial PDB)
+  ConsoleCalc.vcxproj -> F:\Git\clone\ArithmeticExpressionParser\test\Debug\ConsoleCalc.exe
+  ConsoleCalc.vcxproj -> F:\Git\clone\ArithmeticExpressionParser\test\Debug\ConsoleCalc.pdb (Partial PDB)

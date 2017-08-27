@@ -14,11 +14,14 @@ Calculator : public
 ********************************/
 Calculator::Calculator() : source_length(0), error_code(-1), error_pos(-1)
 {
-
+	result_array = new char[MAX_SIZE * sizeof(double) + MAX_SIZE];
+	result_ptr = result_array;
 }
 Calculator::~Calculator()
 {
+	delete result_array;
 	source = nullptr;
+	result_array = nullptr;
 }
 bool Calculator::input(const char* source)
 {
@@ -35,7 +38,8 @@ bool Calculator::input(const char* source)
 	if (mode == QUIT)
 		return false;
 	if (mode == GET_HISTORY ||
-		mode == ACC)
+		mode == ACC ||
+		mode == ALL)
 		return true;
 	calculate();
 	result_dev = 0;
@@ -70,9 +74,46 @@ double Calculator::getResultAcc()
 		sum += ele;
 	return sum;
 }
-double Calculator::getResult()
+char* Calculator::c_getResult()
 {
-	return current_result;					/*return the top of result*/
+	if (mode == ALL)
+	{
+		for (auto res : result)
+		{
+			storeDoubleInCharArray(res);
+		}	
+	}
+	else if (mode == GENERAL)
+	{
+		storeDoubleInCharArray(result.back());
+	}
+	else if (mode == ACC)
+	{
+		double acc = getResultAcc();
+		storeDoubleInCharArray(acc);
+	}
+	else if (mode == GET_HISTORY)
+	{
+		if (result_dev > result.size() - 1)
+		{
+			error_code = 8;
+			printError(getErrorInformtion());
+			return " ";
+		}
+		else
+		{
+			double tmp = result.at(result.size() - result_dev - 1);
+			storeDoubleInCharArray(tmp);
+			result_dev++;
+		}
+	}
+	return result_array;					/*return the top of result*/
+}
+std::string Calculator::getResult()
+{
+	//TODO
+
+	return " ";
 }
 const char* Calculator::getErrorInformtion() const
 {
@@ -114,36 +155,10 @@ bool Calculator::isError() const
 }
 void Calculator::printResult()
 {
-	if (mode == GET_HISTORY)
-	{
-		if (result_dev > result.size() - 1)
-		{
-			error_code = 8;
-		}
-		else
-		{
-			current_result = result.at(result.size() - result_dev - 1);
-			result_dev++;
-		}
-	}
-	else if (mode == GENERAL)
-	{
-		current_result = result.back();
-	}
-	else if (mode == ACC)
-	{
-		current_result = getResultAcc();
-	}
-
-	if (isError())
-	{
-		printError(getErrorInformtion());
-	}
-	else
-	{
-		double res = getResult();
-		std::cout << "\nReuslt : " << res << "\n\n";		/*print result*/
-	}
+	char* res = c_getResult();
+	std::cout << "\nReuslt : " << res << "\n\n";		/*print result*/
+	result_ptr = result_array;
+	memset(result_array, '\0', sizeof(result_array) / sizeof(char));
 }
 /*******************************
 Calculator : private : general function
@@ -162,6 +177,10 @@ int Calculator::checkMode()
 		source[0] == '-' &&
 		source[1] == 's')
 		return ACC;
+	if (source_length == 2 &&								/*check if accumulate*/
+		source[0] == '-' &&
+		source[1] == 'a')
+		return ALL;
 	return GENERAL;
 }
 bool Calculator::checkLegality()
@@ -181,10 +200,10 @@ bool Calculator::convertToPostfixExpression()
 	for (int i = 0; i < source_length; i++)
 	{
 		char current_char = source[i];		/*get current character*/
-		if (isNumber(current_char))			/*if the character is number*/
+		if (isNumber(current_char) || (current_char == '-' && (i == 0 || source[i-1] == '(')))			/*if the character is number*/
 		{
 			std::string number = "";
-			while (isNumber(current_char))	/*joint next character if it is a number*/
+			while (isNumber(current_char) || (current_char == '-' && (i == 0 || source[i - 1] == '(')))	/*joint next character if it is a number*/
 			{
 				number += current_char;
 				if (i == source_length - 1)
@@ -302,6 +321,20 @@ std::string Calculator::convertDoubleToString(double& val)
 	std::string str = buf;
 	return str;
 }
+void Calculator::storeDoubleInCharArray(double& val)
+{
+	char temp[20];
+	memset(temp, '\0', 20);
+	if(val == (int)val)
+		sprintf(temp, "%.0f", val);
+	else
+		sprintf(temp, "%f", val);
+	strcpy(result_ptr, temp);
+	result_ptr += strlen(temp);
+	*result_ptr = ' ';
+	result_ptr++;
+	*result_ptr = '\0';
+}
 bool Calculator::isBarcketMatch()
 {
 	return true;
@@ -361,7 +394,7 @@ bool Calculator::isSymbolsLegal()
 			return false;
 		}
 		/* 1+(*(2+3))+4 */
-		if (isSymbol(std::string(1, ch)) && source[i - 1] == '(')
+		if (isSymbol(std::string(1, ch)) && source[i - 1] == '(' && ch != '-')
 		{
 			error_code = 4;
 			error_pos = i;
@@ -409,7 +442,7 @@ bool Calculator::isNumberLegal(const std::string& str)
 			else
 				return false;
 		}
-		if (!isNumber(str[i]))
+		if (!isNumber(str[i]) && str[i] != '-')
 			return false;
 	}
 	return true;

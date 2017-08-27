@@ -7,6 +7,7 @@ Description : an arithmetic expression parser class
 ************************************************/
 
 #pragma once
+#define _CRT_SECURE_NO_WARNINGS
 #include <list>
 #include <vector>
 #include <stdlib.h>
@@ -14,6 +15,7 @@ Description : an arithmetic expression parser class
 #include <stdlib.h>    
 #include <crtdbg.h> 
 #include <iostream>
+#include <string>
 #define MAX_SIZE 100										/*max array capacity*/
 
 class Calculator
@@ -29,7 +31,8 @@ class Calculator
 		GENERAL = -1,
 		QUIT = 0,
 		GET_HISTORY = 1,
-		ACC = 2
+		ACC = 2,
+		ALL = 3
 	};
 private:
 	int error_code;											/*error code*/
@@ -38,6 +41,8 @@ private:
 	double current_result;									/*current result*/
 	int result_dev;											/*dev to get history result*/
 	int mode;												/*mode*/
+	char* result_array;										/*char array to store result*/
+	char* result_ptr;
 	const char* source;										/*source array*/
 	std::list<char> stack;									/*list to store symbol temporarily*/
 	std::list<std::string> postfix;							/*list to store postfix expression*/
@@ -52,11 +57,13 @@ public:
 	bool input(const char* source);							/*store the source array and check the mode*/
 	void initCalc();										/*initializate calculator(clear lists, reset ints)*/
 	void calculate();										/*check legality, convert to postfix expression, process result*/
-	double getResult();										/*return the result*/
+	char* c_getResult();									/*return the result of c style*/
+	std::string getResult();								/*return the result of stl style*/
 	double getResultAcc();									/*accumulate all result*/
 	const char* getErrorInformtion() const;					/*return the error information*/
 	bool isError() const;									/*return true if error occur*/
 	void printResult();										/*print result or error information*/
+	void printError(const char* error);						/*formatted print error*/
 
 private:
 	int checkMode();										/*check mode*/
@@ -66,7 +73,7 @@ private:
 
 private:
 	std::string convertDoubleToString(double& val);			/*convert double to string*/
-	void printError(const char* error);						/*formatted print error*/
+	void storeDoubleInCharArray(double& val);
 	bool isSymbolsLegal();									/*check if symbols legal*/
 	bool isBarcketMatch();									/*check if barcket matching*/
 	bool isNumber(const char& ch);							/*check if the char is number( 0123456789. )*/

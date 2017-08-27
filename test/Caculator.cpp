@@ -12,44 +12,74 @@ Description : an arithmetic expression parser class
 /*******************************
 Calculator : public
 ********************************/
-Calculator::Calculator() : source_length(0), error_code(-1), error_pos(-1)
+Calculator::Calculator()
 {
-	result_array = new char[MAX_SIZE * sizeof(double) + MAX_SIZE];
-	result_ptr = result_array;
+	initCalc();
+	output_buffer = new char[MAX_SIZE * sizeof(double) + MAX_SIZE];
+	buffer_ptr = output_buffer;
+}
+Calculator::Calculator(const Calculator& calc)
+{
+	//TODO
+}
+Calculator::Calculator(const char* source)
+{
+	//TODO
 }
 Calculator::~Calculator()
 {
-	delete result_array;
+	delete output_buffer;
 	source = nullptr;
-	result_array = nullptr;
+	output_buffer = nullptr;
 }
 bool Calculator::input(const char* source)
 {
 	initCalc();
 
-	this->source = source;									/*store source*/
-	source_length = strlen(source);							/*get the length of expression*/
+	this->source = source;											/*store source*/
+	state.source_length = strlen(source);							/*get the length of expression*/
 
 															/******************************
 															0.general calculate
 															1.get history result
 															*******************************/
-	mode = checkMode();
-	if (mode == QUIT)
+	state.mode = checkMode();
+	if (state.mode == QUIT)
 		return false;
-	if (mode == GET_HISTORY ||
-		mode == ACC ||
-		mode == ALL)
+	if (state.mode == GET_HISTORY ||
+		state.mode == ACC ||
+		state.mode == ALL)
+	{
+		checkCommandLegality();
 		return true;
+	}
+		
 	calculate();
-	result_dev = 0;
+	state.result_dev = 0;
 	return true;
+}
+bool Calculator::checkCommandLegality()
+{
+	//temp ¡ý
+	if (state.mode == GET_HISTORY)
+	{
+		if (state.result_dev > result.size() - 1)
+		{
+			state.error_code = 8;
+			return false;
+		}
+	}
+	if (state.mode == ALL && result.size() == 0)
+	{
+		state.error_code = 8;
+		return false;
+	}
 }
 void Calculator::initCalc()
 {
-	source_length = 0;
-	error_code = -1;
-	error_pos = -1;
+	state.source_length = 0;
+	state.error_code = -1;
+	state.error_position = -1;
 	postfix.clear();						/*reset posfix expression*/
 	stack.clear();							/*reset stack*/
 }
@@ -76,38 +106,38 @@ double Calculator::getResultAcc()
 }
 char* Calculator::c_getResult()
 {
-	if (mode == ALL)
+	if (state.mode == ALL)
 	{
 		for (auto res : result)
 		{
 			storeDoubleInCharArray(res);
 		}	
 	}
-	else if (mode == GENERAL)
+	else if (state.mode == GENERAL)
 	{
 		storeDoubleInCharArray(result.back());
 	}
-	else if (mode == ACC)
+	else if (state.mode == ACC)
 	{
 		double acc = getResultAcc();
 		storeDoubleInCharArray(acc);
 	}
-	else if (mode == GET_HISTORY)
+	else if (state.mode == GET_HISTORY)
 	{
-		if (result_dev > result.size() - 1)
+		if (state.result_dev > result.size() - 1)
 		{
-			error_code = 8;
+			state.error_code = 8;
 			printError(getErrorInformtion());
 			return " ";
 		}
 		else
 		{
-			double tmp = result.at(result.size() - result_dev - 1);
+			double tmp = result.at(result.size() - state.result_dev - 1);
 			storeDoubleInCharArray(tmp);
-			result_dev++;
+			state.result_dev++;
 		}
 	}
-	return result_array;					/*return the top of result*/
+	return output_buffer;					/*return the top of result*/
 }
 std::string Calculator::getResult()
 {
@@ -117,7 +147,7 @@ std::string Calculator::getResult()
 }
 const char* Calculator::getErrorInformtion() const
 {
-	switch (error_code)										/*return error information*/
+	switch (state.error_code)										/*return error information*/
 	{
 	case 0:
 		return "valid character";
@@ -151,33 +181,33 @@ const char* Calculator::getErrorInformtion() const
 }
 bool Calculator::isError() const
 {
-	return error_code == -1 ? false : true;
+	return state.error_code == -1 ? false : true;
 }
 void Calculator::printResult()
 {
 	char* res = c_getResult();
 	std::cout << "\nReuslt : " << res << "\n\n";		/*print result*/
-	result_ptr = result_array;
-	memset(result_array, '\0', sizeof(result_array) / sizeof(char));
+	buffer_ptr = output_buffer;
+	memset(output_buffer, '\0', sizeof(output_buffer) / sizeof(char));
 }
 /*******************************
 Calculator : private : general function
 ********************************/
 int Calculator::checkMode()
 {
-	if (source_length == 2 &&								/*check if quit*/
+	if (state.source_length == 2 &&								/*check if quit*/
 		source[0] == '-' &&
 		source[1] == 'q')
 		return QUIT;
-	if (source_length == 2 &&								/*check if get history*/
+	if (state.source_length == 2 &&								/*check if get history*/
 		source[0] == '-' &&
 		source[1] == 'h')
 		return GET_HISTORY;
-	if (source_length == 2 &&								/*check if accumulate*/
+	if (state.source_length == 2 &&								/*check if accumulate*/
 		source[0] == '-' &&
 		source[1] == 's')
 		return ACC;
-	if (source_length == 2 &&								/*check if accumulate*/
+	if (state.source_length == 2 &&								/*check if accumulate*/
 		source[0] == '-' &&
 		source[1] == 'a')
 		return ALL;
@@ -197,7 +227,7 @@ bool Calculator::checkLegality()
 }
 bool Calculator::convertToPostfixExpression()
 {
-	for (int i = 0; i < source_length; i++)
+	for (int i = 0; i < state.source_length; i++)
 	{
 		char current_char = source[i];		/*get current character*/
 		if (isNumber(current_char) || (current_char == '-' && (i == 0 || source[i-1] == '(')))			/*if the character is number*/
@@ -206,18 +236,18 @@ bool Calculator::convertToPostfixExpression()
 			while (isNumber(current_char) || (current_char == '-' && (i == 0 || source[i - 1] == '(')))	/*joint next character if it is a number*/
 			{
 				number += current_char;
-				if (i == source_length - 1)
+				if (i == state.source_length - 1)
 					break;
 				current_char = source[++i];
 			}
 			if (!isNumberLegal(number))		/*cheack the legality of the number string*/
 			{
-				error_code = 1;				/*raise error*/
+				state.error_position = 1;				/*raise error*/
 				return false;
 			}
 			postfix.push_back(number);		/*push the number string into postfix_expression*/
 		}
-		if (i == source_length - 1)
+		if (i == state.source_length - 1)
 			break;
 		if (stack.empty() || stack.back() == '(' && current_char != ')')
 		{
@@ -295,8 +325,8 @@ bool Calculator::processResult()
 				double divisor = atof(vec.at(index - 1).c_str());
 				if (divisor == 0)
 				{
-					error_code = 7;
-					error_pos = index;
+					state.error_code = 7;
+					state.error_position = index;
 					return false;
 				}
 				temp = atof(vec.at(index - 2).c_str()) / atof(vec.at(index - 1).c_str());
@@ -329,11 +359,11 @@ void Calculator::storeDoubleInCharArray(double& val)
 		sprintf(temp, "%.0f", val);
 	else
 		sprintf(temp, "%f", val);
-	strcpy(result_ptr, temp);
-	result_ptr += strlen(temp);
-	*result_ptr = ' ';
-	result_ptr++;
-	*result_ptr = '\0';
+	strcpy(buffer_ptr, temp);
+	buffer_ptr += strlen(temp);
+	*buffer_ptr = ' ';
+	buffer_ptr++;
+	*buffer_ptr = '\0';
 }
 bool Calculator::isBarcketMatch()
 {
@@ -341,63 +371,63 @@ bool Calculator::isBarcketMatch()
 }
 bool Calculator::isSymbolsLegal()
 {
-	for (int i = 0; i < source_length; i++)
+	for (int i = 0; i < state.source_length; i++)
 	{
 		char ch = source[i];
 		/* 1@2+3 */
 		if (legal_chars.find(ch) == std::string::npos)
 		{
-			error_code = 0;
-			error_pos = i;
+			state.error_code = 0;
+			state.error_position = i;
 			return false;
 		}
 		/* 1(2+3) */
 		if (ch == '(' && i != 0 && isNumber(source[i - 1]))
 		{
-			error_code = 2;
-			error_pos = i;
+			state.error_code = 2;
+			state.error_position = i;
 			return false;
 		}
 		/*1+(2+3)4 */
-		if (ch == ')' && i < source_length - 1 && isNumber(source[i + 1]))
+		if (ch == ')' && i < state.source_length - 1 && isNumber(source[i + 1]))
 		{
-			error_code = 2;
-			error_pos = i;
+			state.error_code = 2;
+			state.error_position = i;
 			return false;
 		}
 		/* 1+2+3+ */
-		if (isSymbol(std::string(1, ch)) && i == source_length - 1)
+		if (isSymbol(std::string(1, ch)) && i == state.source_length - 1)
 		{
-			error_code = 3;
-			error_pos = i;
+			state.error_code = 3;
+			state.error_position = i;
 			return false;
 		}
 		/* 1++2+3 */
-		if (isSymbol(std::string(1, ch)) && i < source_length - 1 && isSymbol(std::string(1, source[i + 1])))
+		if (isSymbol(std::string(1, ch)) && i < state.source_length - 1 && isSymbol(std::string(1, source[i + 1])))
 		{
-			error_code = 3;
-			error_pos = i;
+			state.error_code = 3;
+			state.error_position = i;
 			return false;
 		}
 		/* 1+2+()+3 */
-		if (ch == '(' && i < source_length - 1 && source[i + 1] == ')')
+		if (ch == '(' && i < state.source_length - 1 && source[i + 1] == ')')
 		{
-			error_code = 3;
-			error_pos = i;
+			state.error_code = 3;
+			state.error_position = i;
 			return false;
 		}
 		/* 1+((2+3)*)+4 */
-		if (isSymbol(std::string(1, ch)) && i < source_length - 1 && source[i + 1] == ')')
+		if (isSymbol(std::string(1, ch)) && i < state.source_length - 1 && source[i + 1] == ')')
 		{
-			error_code = 4;
-			error_pos = i;
+			state.error_code = 4;
+			state.error_position = i;
 			return false;
 		}
 		/* 1+(*(2+3))+4 */
 		if (isSymbol(std::string(1, ch)) && source[i - 1] == '(' && ch != '-')
 		{
-			error_code = 4;
-			error_pos = i;
+			state.error_code = 4;
+			state.error_position = i;
 			return false;
 		}
 	}
@@ -406,8 +436,8 @@ bool Calculator::isSymbolsLegal()
 void Calculator::printError(const char* error)
 {
 	std::cout << "\n  ERROR : " << error;
-	if (error_pos != -1)
-		std::cout << " : No." << error_pos << "\n\n";
+	if (state.error_code != -1)
+		std::cout << " : No." << state.error_position << "\n\n";
 	else
 		std::cout << "\n\n";
 }

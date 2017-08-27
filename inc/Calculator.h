@@ -19,30 +19,35 @@ Description : an arithmetic expression parser class
 #define MAX_SIZE 100										/*max array capacity*/
 
 class Calculator
-{
-	/*	
-		COMMAND		action
-		-q			quit
-		-h			show the previous result
-		-s			accumulate previous results
-	*/
+{	
 	enum COMMAND
 	{
+		/****************************************
+		COMMAND		action
+		-q			quit
+		-h			return the previous result
+		-s			accumulate previous results
+		-a          return all history results
+		*****************************************/
 		GENERAL = -1,
 		QUIT = 0,
 		GET_HISTORY = 1,
 		ACC = 2,
 		ALL = 3
 	};
+	struct CalcState
+	{
+		int mode;
+		int source_length;
+		int result_dev;
+		bool is_error;
+		int error_code;
+		int error_position;
+	};
 private:
-	int error_code;											/*error code*/
-	int error_pos;											/*error position*/
-	int source_length;										/*the length of source array*/
-	double current_result;									/*current result*/
-	int result_dev;											/*dev to get history result*/
-	int mode;												/*mode*/
-	char* result_array;										/*char array to store result*/
-	char* result_ptr;
+	CalcState state;										/*the state of calculator*/
+	char* output_buffer;									/*buffer to store output*/
+	char* buffer_ptr;										/*pointer of buffer element*/
 	const char* source;										/*source array*/
 	std::list<char> stack;									/*list to store symbol temporarily*/
 	std::list<std::string> postfix;							/*list to store postfix expression*/
@@ -53,6 +58,8 @@ private:
 
 public:
 	Calculator();											/*default constructor*/
+	Calculator(const Calculator& calc);
+	Calculator(const char* source);							
 	~Calculator();											/*destructor*/
 	bool input(const char* source);							/*store the source array and check the mode*/
 	void initCalc();										/*initializate calculator(clear lists, reset ints)*/
@@ -66,6 +73,13 @@ public:
 	void printError(const char* error);						/*formatted print error*/
 
 private:
+	/////////////////////////////////////
+	
+	bool checkCommandLegality();
+	//bool checkExpressionLegality();
+	//bool checkNumberLegality();
+
+	/////////////////////////////////////
 	int checkMode();										/*check mode*/
 	bool checkLegality();									/*check the barcket matching, check the symbols*/
 	bool convertToPostfixExpression();						/*convert infix expression to postfix expression*/

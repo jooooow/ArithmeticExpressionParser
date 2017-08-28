@@ -1,7 +1,9 @@
-﻿  Caculator.cpp
-f:\git\clone\arithmeticexpressionparser\test\caculator.cpp(65): warning C4018: '>': signed/unsigned mismatch
-f:\git\clone\arithmeticexpressionparser\test\caculator.cpp(126): warning C4018: '>': signed/unsigned mismatch
-f:\git\clone\arithmeticexpressionparser\test\caculator.cpp(465): warning C4018: '<': signed/unsigned mismatch
-f:\git\clone\arithmeticexpressionparser\test\caculator.cpp(76): warning C4715: 'Calculator::checkCommandLegality': not all control paths return a value
+﻿  Main.cpp
+  Caculator.cpp
+f:\git\clone\arithmeticexpressionparser\test\caculator.cpp(66): warning C4018: '>': signed/unsigned mismatch
+f:\git\clone\arithmeticexpressionparser\test\caculator.cpp(127): warning C4018: '>': signed/unsigned mismatch
+f:\git\clone\arithmeticexpressionparser\test\caculator.cpp(466): warning C4018: '<': signed/unsigned mismatch
+  Generating Code...
+f:\git\clone\arithmeticexpressionparser\test\caculator.cpp(77): warning C4715: 'Calculator::checkCommandLegality': not all control paths return a value
   ConsoleCalc.vcxproj -> F:\Git\clone\ArithmeticExpressionParser\test\Debug\ConsoleCalc.exe
   ConsoleCalc.vcxproj -> F:\Git\clone\ArithmeticExpressionParser\test\Debug\ConsoleCalc.pdb (Partial PDB)

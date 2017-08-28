@@ -8,6 +8,7 @@ Description : an arithmetic expression parser class
 
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
+#define MAX_SIZE 100										/*max array capacity*/
 #include <list>
 #include <vector>
 #include <stdlib.h>
@@ -16,7 +17,11 @@ Description : an arithmetic expression parser class
 #include <crtdbg.h> 
 #include <iostream>
 #include <string>
-#define MAX_SIZE 100										/*max array capacity*/
+
+typedef std::string stl_string;
+typedef std::list<char> char_list;
+typedef std::list<stl_string> string_list;
+typedef std::vector<double> double_vector;
 
 class Calculator
 {	
@@ -44,17 +49,18 @@ class Calculator
 		int error_code;
 		int error_position;
 	};
+
 private:
-	CalcState state;										/*the state of calculator*/
 	char* output_buffer;									/*buffer to store output*/
 	char* buffer_ptr;										/*pointer of buffer element*/
 	const char* source;										/*source array*/
-	std::list<char> stack;									/*list to store symbol temporarily*/
-	std::list<std::string> postfix;							/*list to store postfix expression*/
-	std::vector<double> result;								/*vector to store historical result*/
+	CalcState state;										/*the state of calculator*/
+	char_list stack;										/*list to store symbol temporarily*/
+	string_list postfix;									/*list to store postfix expression*/
+	double_vector result;									/*vector to store historical result*/
 
 private:
-	const std::string legal_chars = "+-*/0123456789().";	/*legal characters*/
+	const stl_string legal_chars = "+-*/0123456789().";	/*legal characters*/
 
 public:
 	Calculator();											/*default constructor*/
@@ -65,7 +71,7 @@ public:
 	void initCalc();										/*initializate calculator(clear lists, reset ints)*/
 	void calculate();										/*check legality, convert to postfix expression, process result*/
 	char* c_getResult();									/*return the result of c style*/
-	std::string getResult();								/*return the result of stl style*/
+	stl_string getResult();									/*return the result of stl style*/
 	double getResultAcc();									/*accumulate all result*/
 	const char* getErrorInformtion() const;					/*return the error information*/
 	bool isError() const;									/*return true if error occur*/
@@ -86,12 +92,12 @@ private:
 	bool processResult();									/*calculate result from postfix expression, push into result stack*/
 
 private:
-	std::string convertDoubleToString(double& val);			/*convert double to string*/
+	stl_string convertDoubleToString(double& val);			/*convert double to string*/
 	void storeDoubleInCharArray(double& val);
 	bool isSymbolsLegal();									/*check if symbols legal*/
 	bool isBarcketMatch();									/*check if barcket matching*/
 	bool isNumber(const char& ch);							/*check if the char is number( 0123456789. )*/
-	bool isSymbol(const std::string& str);					/*check if the char is symbol ( +-/*)( )*/
-	bool isNumberLegal(const std::string& str);				/*check if the number legal*/
+	bool isSymbol(const stl_string& str);					/*check if the char is symbol ( +-/*)( )*/
+	bool isNumberLegal(const stl_string& str);				/*check if the number legal*/
 	bool isPrior(const char& ch1, const char& ch2);			/*check if ch1 is prior to ch2*/
 };

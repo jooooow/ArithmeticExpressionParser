@@ -28,7 +28,7 @@ Calculator::Calculator(const char* source)
 }
 Calculator::~Calculator()
 {
-	delete output_buffer;
+	delete[] output_buffer;
 	source = nullptr;
 	output_buffer = nullptr;
 }
@@ -38,10 +38,11 @@ bool Calculator::input(const char* source)
 
 	this->source = source;											/*store source*/
 	state.source_length = strlen(source);							/*get the length of expression*/
-															/******************************
-															0.general calculate
-															1.get history result
-															*******************************/
+
+	/******************************
+	0.general calculate
+	1.get history result
+	*******************************/
 	state.mode = checkMode();
 	if (state.mode == QUIT)
 		return false;

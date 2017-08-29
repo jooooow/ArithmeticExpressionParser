@@ -19,3 +19,5 @@ This is a C++ class to parse arithmetic expression.
 	2.some function changes
 	
 	3.add 'review all' function
+	
+	4.type optimize

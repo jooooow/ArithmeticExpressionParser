@@ -6,7 +6,7 @@ File : Main.cpp
 Description : a test of the arithmetic expression parser class
 ************************************************/
 
-//#define DEBUG
+#define DEBUG
 #include <iostream>
 #include "Calculator.h"
 

@@ -28,7 +28,7 @@ Calculator::Calculator(const char* source)
 }
 Calculator::~Calculator()
 {
-	delete output_buffer;
+	delete[] output_buffer;
 	source = nullptr;
 	output_buffer = nullptr;
 }
@@ -39,10 +39,10 @@ bool Calculator::input(const char* source)
 	this->source = source;											/*store source*/
 	state.source_length = strlen(source);							/*get the length of expression*/
 
-															/******************************
-															0.general calculate
-															1.get history result
-															*******************************/
+	/******************************
+	0.general calculate
+	1.get history result
+	*******************************/
 	state.mode = checkMode();
 	if (state.mode == QUIT)
 		return false;
@@ -139,11 +139,11 @@ char* Calculator::c_getResult()
 	}
 	return output_buffer;					/*return the top of result*/
 }
-std::string Calculator::getResult()
+stl_string Calculator::getResult()
 {
 	//TODO
-
-	return " ";
+	stl_string str = "";
+	return str;
 }
 const char* Calculator::getErrorInformtion() const
 {
@@ -232,7 +232,7 @@ bool Calculator::convertToPostfixExpression()
 		char current_char = source[i];		/*get current character*/
 		if (isNumber(current_char) || (current_char == '-' && (i == 0 || source[i-1] == '(')))			/*if the character is number*/
 		{
-			std::string number = "";
+			stl_string number = "";
 			while (isNumber(current_char) || (current_char == '-' && (i == 0 || source[i - 1] == '(')))	/*joint next character if it is a number*/
 			{
 				number += current_char;
@@ -263,14 +263,14 @@ bool Calculator::convertToPostfixExpression()
 		{
 			while (stack.back() != '(')		/*pop until '('*/
 			{
-				postfix.push_back(std::string(1, stack.back()));
+				postfix.push_back(stl_string(1, stack.back()));
 				stack.pop_back();
 			}
 			stack.pop_back();
 		}
 		else								/*if current character is not prior to top, then pop top*/
 		{
-			postfix.push_back(std::string(1, stack.back()));
+			postfix.push_back(stl_string(1, stack.back()));
 			stack.pop_back();
 			stack.push_back(current_char);
 		}
@@ -278,7 +278,7 @@ bool Calculator::convertToPostfixExpression()
 	while (!stack.empty())					/*pop all symbol*/
 	{
 		if (stack.back() != '(')			/*skip '('*/
-			postfix.push_back(std::string(1, stack.back()));
+			postfix.push_back(stl_string(1, stack.back()));
 		stack.pop_back();
 	}
 	return true;
@@ -286,7 +286,7 @@ bool Calculator::convertToPostfixExpression()
 bool Calculator::processResult()
 {
 	/*copy postfix to vector*/
-	std::vector<std::string> vec(postfix.begin(), postfix.end());
+	std::vector<stl_string> vec(postfix.begin(), postfix.end());
 	int index = 0;
 	while (vec.size() != 1)					/*loop until get result*/
 	{
@@ -344,11 +344,11 @@ bool Calculator::processResult()
 /*******************************
 Calculator : private : tool function
 ********************************/
-std::string Calculator::convertDoubleToString(double& val)
+stl_string Calculator::convertDoubleToString(double& val)
 {
 	char buf[20];
 	sprintf_s(buf, "%f", val);
-	std::string str = buf;
+	stl_string str = buf;
 	return str;
 }
 void Calculator::storeDoubleInCharArray(double& val)
@@ -375,7 +375,7 @@ bool Calculator::isSymbolsLegal()
 	{
 		char ch = source[i];
 		/* 1@2+3 */
-		if (legal_chars.find(ch) == std::string::npos)
+		if (legal_chars.find(ch) == stl_string::npos)
 		{
 			state.error_code = 0;
 			state.error_position = i;
@@ -396,14 +396,14 @@ bool Calculator::isSymbolsLegal()
 			return false;
 		}
 		/* 1+2+3+ */
-		if (isSymbol(std::string(1, ch)) && i == state.source_length - 1)
+		if (isSymbol(stl_string(1, ch)) && i == state.source_length - 1)
 		{
 			state.error_code = 3;
 			state.error_position = i;
 			return false;
 		}
 		/* 1++2+3 */
-		if (isSymbol(std::string(1, ch)) && i < state.source_length - 1 && isSymbol(std::string(1, source[i + 1])))
+		if (isSymbol(stl_string(1, ch)) && i < state.source_length - 1 && isSymbol(stl_string(1, source[i + 1])))
 		{
 			state.error_code = 3;
 			state.error_position = i;
@@ -417,14 +417,14 @@ bool Calculator::isSymbolsLegal()
 			return false;
 		}
 		/* 1+((2+3)*)+4 */
-		if (isSymbol(std::string(1, ch)) && i < state.source_length - 1 && source[i + 1] == ')')
+		if (isSymbol(stl_string(1, ch)) && i < state.source_length - 1 && source[i + 1] == ')')
 		{
 			state.error_code = 4;
 			state.error_position = i;
 			return false;
 		}
 		/* 1+(*(2+3))+4 */
-		if (isSymbol(std::string(1, ch)) && source[i - 1] == '(' && ch != '-')
+		if (isSymbol(stl_string(1, ch)) && source[i - 1] == '(' && ch != '-')
 		{
 			state.error_code = 4;
 			state.error_position = i;
@@ -448,7 +448,7 @@ bool Calculator::isNumber(const char& ch)
 	else
 		return false;
 }
-bool Calculator::isSymbol(const std::string& str)
+bool Calculator::isSymbol(const stl_string& str)
 {
 	if (str == "+" ||
 		str == "-" ||
@@ -460,7 +460,7 @@ bool Calculator::isSymbol(const std::string& str)
 	else
 		return false;
 }
-bool Calculator::isNumberLegal(const std::string& str)
+bool Calculator::isNumberLegal(const stl_string& str)
 {
 	bool hasDot = false;
 	for (int i = 0; i < str.size(); i++)

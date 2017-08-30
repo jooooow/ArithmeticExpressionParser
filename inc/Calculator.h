@@ -18,13 +18,14 @@ Description : an arithmetic expression parser class
 #include <iostream>
 #include <string>
 
-typedef std::string stl_string;
-typedef std::list<char> char_list;
-typedef std::list<stl_string> string_list;
-typedef std::vector<double> double_vector;
-
 class Calculator
 {	
+public:
+	typedef std::string				stl_string;
+	typedef std::list<char>			char_list;
+	typedef std::list<stl_string>	string_list;
+	typedef std::vector<double>		double_vector;
+
 	enum COMMAND
 	{
 		/****************************************
